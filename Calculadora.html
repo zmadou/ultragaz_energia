@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Ultragaz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .form-control {
+            width: 200px;
+        }
+        .valor-anual-desconto {
+margin-bottom: 400px;
+}
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+
+        }
+
+        .result-container {
+            margin-top: 20px;
+            margin-bottom: 150px; /* Espaço extra para evitar sobreposição */
+        }
+
+        footer {
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            background-color: #f8f9fa;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Calculadora de Energia</h2>
+        <div class="mb-3">
+            <label for="phase" class="form-label">Escolha a Fase:</label>
+            <div>
+                <button id="monofasico" class="btn btn-primary" onclick="selectPhase(30)">Monofásico (30)</button>
+                <button id="bifasico" class="btn btn-primary" onclick="selectPhase(50)">Bifásico (50)</button>
+                <button id="trifasico" class="btn btn-primary" onclick="selectPhase(100)">Trifásico (100)</button>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="consumo" class="form-label">Consumo em kWh:</label>
+            <input type="number" class="form-control" id="consumo">
+        </div>
+        <div class="mb-3">
+            <label for="tusd" class="form-label">TUSD (Sem Imposto):</label>
+            <input type="number" class="form-control" id="tusd">
+        </div>
+        <div class="mb-3">
+            <label for="te" class="form-label">TE (Sem Imposto):</label>
+            <input type="number" class="form-control" id="te">
+        </div>
+        <div class="mb-3">
+            <label for="tusd-imposto" class="form-label">TUSD (Com Imposto):</label>
+            <input type="number" class="form-control" id="tusd-imposto">
+        </div>
+        <div class="mb-3">
+            <label for="te-imposto" class="form-label">TE (Com Imposto):</label>
+            <input type="number" class="form-control" id="te-imposto">
+        </div>
+        <div class="mb-3">
+            <label for="desconto" class="form-label">Desconto (%):</label>
+            <input type="number" class="form-control" id="desconto">
+        </div>
+        <button class="btn btn-primary" onclick="calcular()">Calcular</button>
+
+        <div class="result-container">
+            <h4>Resultados:</h4>
+            <p id="resultado-com-imposto"></p>
+            <p id="resultado-sem-imposto"></p>
+            <p id="resultado-com-desconto"></p>
+            <p id="valor-desconto"></p>
+            <p id="valor-anual-desconto"></p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Todos os direitos reservados © 2024 | By: <a href="https://github.com/zmadou" target="_blank">zMadou</a></p>
+    </footer>
+
+    <script>
+        let fase = 0;
+
+        function selectPhase(value) {
+            fase = value;
+            document.getElementById('monofasico').classList.remove('btn-primary');
+            document.getElementById('bifasico').classList.remove('btn-primary');
+            document.getElementById('trifasico').classList.remove('btn-primary');
+
+            if (value === 30) {
+                document.getElementById('monofasico').classList.add('btn-primary');
+            } else if (value === 50) {
+                document.getElementById('bifasico').classList.add('btn-primary');
+            } else {
+                document.getElementById('trifasico').classList.add('btn-primary');
+            }
+        }
+
+        function calcular() {
+            const consumo = parseFloat(document.getElementById('consumo').value);
+            const desconto = parseFloat(document.getElementById('desconto').value) / 100;
+
+            const tusdSemImposto = parseFloat(document.getElementById('tusd').value);
+            const teSemImposto = parseFloat(document.getElementById('te').value);
+
+            const tusdComImposto = parseFloat(document.getElementById('tusd-imposto').value);
+            const teComImposto = parseFloat(document.getElementById('te-imposto').value);
+
+            const valorSemImposto = (tusdSemImposto + teSemImposto) * (consumo - fase);
+            const valorComImposto = (tusdComImposto + teComImposto) * (consumo - fase);
+            const valorComDesconto = valorSemImposto * (1 - desconto);
+
+            const valorAnualSemImposto = valorSemImposto * 12;
+            const valorAnualComImposto = valorComImposto * 12;
+            const valorAnualComDesconto = valorComDesconto * 12;
+            const valorDoDesconto = valorSemImposto - valorComDesconto;
+            const valorAnualDesconto = valorDoDesconto * 12;
+
+            document.getElementById('resultado-com-imposto').textContent = `Valor com Imposto: R$ ${valorComImposto.toFixed(2)} (Anual: R$ ${valorAnualComImposto.toFixed(2)})`;
+            document.getElementById('resultado-sem-imposto').textContent = `Valor Líquido: R$ ${valorSemImposto.toFixed(2)} (Anual: R$ ${valorAnualSemImposto.toFixed(2)})`;
+            document.getElementById('resultado-com-desconto').textContent = `Valor com Desconto (Ultragaz): R$ ${valorComDesconto.toFixed(2)} (Anual: R$ ${valorAnualComDesconto.toFixed(2)})`;
+            document.getElementById('valor-desconto').textContent = `Valor do Desconto na Fatura Mensal: R$ ${valorDoDesconto.toFixed(2)}`;
+            document.getElementById('valor-anual-desconto').textContent = `Valor Anual do Desconto: R$ ${valorAnualDesconto.toFixed(2)}`;
+        }
+    </script>
+</body>
+
+</html>
